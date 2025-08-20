@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function App() {
-  // Business premium states
+  // ----- Business Premium -----
   const [business, setBusiness] = useState("");
   const [revenue, setRevenue] = useState("");
   const [businessPremium, setBusinessPremium] = useState(null);
@@ -28,10 +28,10 @@ export default function App() {
     setBusinessPremium(premium.toFixed(2));
   };
 
-  // Building premium states
+  // ----- Building Premium -----
   const [buildingType, setBuildingType] = useState("");
   const [buildingValue, setBuildingValue] = useState("");
-  const [rate, setRate] = useState("");
+  const [buildingRate, setBuildingRate] = useState("");
   const [buildingPremium, setBuildingPremium] = useState(null);
 
   const buildingRates = {
@@ -40,14 +40,32 @@ export default function App() {
   };
 
   const calculateBuildingPremium = () => {
-    if (!buildingType || !buildingValue || !rate) return;
-    const premium = (parseFloat(buildingValue) / 100) * parseFloat(rate);
+    if (!buildingType || !buildingValue || !buildingRate) return;
+    const premium = (parseFloat(buildingValue) / 100) * parseFloat(buildingRate);
     setBuildingPremium(premium.toFixed(2));
+  };
+
+  // ----- Contents / Stock / Equipment / EDP / Customer Goods Premium -----
+  const [contentsType, setContentsType] = useState("");
+  const [contentsValue, setContentsValue] = useState("");
+  const [contentsRate, setContentsRate] = useState("");
+  const [contentsPremium, setContentsPremium] = useState(null);
+
+  const contentsRates = {
+    "Sprinkler & Non-Combustible": [0.05, 0.15],
+    "Non-sprinkler & Wood Frame": [0.25, 0.5],
+  };
+
+  const calculateContentsPremium = () => {
+    if (!contentsType || !contentsValue || !contentsRate) return;
+    const premium = (parseFloat(contentsValue) / 100) * parseFloat(contentsRate);
+    setContentsPremium(premium.toFixed(2));
   };
 
   return (
     <div className="p-6 max-w-md mx-auto bg-white rounded-2xl shadow-md space-y-6">
-      {/* Business Section */}
+      
+      {/* --- Business Section --- */}
       <div>
         <h2 className="text-xl font-bold">Business Premium Calculator</h2>
 
@@ -91,7 +109,7 @@ export default function App() {
         )}
       </div>
 
-      {/* Building Section */}
+      {/* --- Building Section --- */}
       <div>
         <h2 className="text-xl font-bold">Building Premium Calculator</h2>
 
@@ -102,7 +120,7 @@ export default function App() {
             value={buildingType}
             onChange={(e) => {
               setBuildingType(e.target.value);
-              setRate(""); // reset rate
+              setBuildingRate("");
             }}
           >
             <option value="">-- Select --</option>
@@ -119,8 +137,8 @@ export default function App() {
             <span className="text-gray-700">Rate</span>
             <select
               className="mt-1 block w-full border rounded p-2"
-              value={rate}
-              onChange={(e) => setRate(e.target.value)}
+              value={buildingRate}
+              onChange={(e) => setBuildingRate(e.target.value)}
             >
               <option value="">-- Select Rate --</option>
               {buildingRates[buildingType].map((r) => (
@@ -155,7 +173,72 @@ export default function App() {
           </div>
         )}
       </div>
+
+      {/* --- Contents Section --- */}
+      <div>
+        <h2 className="text-xl font-bold">Contents / Stock / Equipment / EDP / Customer Goods Premium</h2>
+
+        <label className="block mt-2">
+          <span className="text-gray-700">Type</span>
+          <select
+            className="mt-1 block w-full border rounded p-2"
+            value={contentsType}
+            onChange={(e) => {
+              setContentsType(e.target.value);
+              setContentsRate("");
+            }}
+          >
+            <option value="">-- Select --</option>
+            {Object.keys(contentsRates).map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {contentsType && (
+          <label className="block mt-2">
+            <span className="text-gray-700">Rate</span>
+            <select
+              className="mt-1 block w-full border rounded p-2"
+              value={contentsRate}
+              onChange={(e) => setContentsRate(e.target.value)}
+            >
+              <option value="">-- Select Rate --</option>
+              {contentsRates[contentsType].map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
+        <label className="block mt-2">
+          <span className="text-gray-700">Value ($)</span>
+          <input
+            type="number"
+            className="mt-1 block w-full border rounded p-2"
+            value={contentsValue}
+            onChange={(e) => setContentsValue(e.target.value)}
+          />
+        </label>
+
+        <button
+          className="w-full bg-purple-600 text-white rounded p-2 mt-3"
+          onClick={calculateContentsPremium}
+        >
+          Calculate Contents Premium
+        </button>
+
+        {contentsPremium && (
+          <div className="p-3 bg-gray-100 rounded mt-2">
+            <strong>Calculated Contents Premium:</strong> ${contentsPremium}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
-
