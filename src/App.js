@@ -145,14 +145,13 @@ export default function App() {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white rounded-2xl shadow-md space-y-6">
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* --- Business Premium --- */}
-      <div>
-        <h2 className="text-xl font-bold">Business Premium Calculator</h2>
+      <CalculatorCard title="Business Premium Calculator">
         <label className="block mt-2">
           <span className="text-gray-700">Type of Business</span>
           <select
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={business}
             onChange={(e) => {
               setBusiness(e.target.value);
@@ -175,7 +174,7 @@ export default function App() {
             <span className="text-gray-700">Custom Rate</span>
             <input
               type="number"
-              className="mt-1 block w-full border rounded p-2"
+              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
               value={customRate}
               onChange={(e) => setCustomRate(e.target.value)}
             />
@@ -185,7 +184,7 @@ export default function App() {
             <label className="block mt-2">
               <span className="text-gray-700">Select Rate</span>
               <select
-                className="mt-1 block w-full border rounded p-2"
+                className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
                 value={businessRate}
                 onChange={(e) => setBusinessRate(e.target.value)}
               >
@@ -204,33 +203,30 @@ export default function App() {
           <span className="text-gray-700">Revenue ($)</span>
           <input
             type="number"
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={revenue}
             onChange={(e) => setRevenue(e.target.value)}
           />
         </label>
 
         <button
-          className="w-full bg-blue-600 text-white rounded p-2 mt-3"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
           onClick={calculateBusinessPremium}
         >
           Calculate Business Premium
         </button>
 
         {businessPremium && (
-          <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Calculated Business Premium:</strong> ${businessPremium}
-          </div>
+          <ResultBox>Calculated Business Premium: ${businessPremium}</ResultBox>
         )}
-      </div>
+      </CalculatorCard>
 
       {/* --- Building Premium --- */}
-      <div>
-        <h2 className="text-xl font-bold">Building Premium Calculator</h2>
+      <CalculatorCard title="Building Premium Calculator">
         <label className="block mt-2">
           <span className="text-gray-700">Building Type</span>
           <select
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={buildingType}
             onChange={(e) => {
               setBuildingType(e.target.value);
@@ -250,7 +246,7 @@ export default function App() {
           <label className="block mt-2">
             <span className="text-gray-700">Rate</span>
             <select
-              className="mt-1 block w-full border rounded p-2"
+              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
               value={buildingRate}
               onChange={(e) => setBuildingRate(e.target.value)}
             >
@@ -268,35 +264,30 @@ export default function App() {
           <span className="text-gray-700">Building Value ($)</span>
           <input
             type="number"
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={buildingValue}
             onChange={(e) => setBuildingValue(e.target.value)}
           />
         </label>
 
         <button
-          className="w-full bg-green-600 text-white rounded p-2 mt-3"
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
           onClick={calculateBuildingPremium}
         >
           Calculate Building Premium
         </button>
 
         {buildingPremium && (
-          <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Calculated Building Premium:</strong> ${buildingPremium}
-          </div>
+          <ResultBox>Calculated Building Premium: ${buildingPremium}</ResultBox>
         )}
-      </div>
+      </CalculatorCard>
 
       {/* --- Contents Premium --- */}
-      <div>
-        <h2 className="text-xl font-bold">
-          Contents / Stock / Equipment / EDP / Customer Goods Premium
-        </h2>
+      <CalculatorCard title="Contents / Stock / Equipment Premium">
         <label className="block mt-2">
           <span className="text-gray-700">Type</span>
           <select
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={contentsType}
             onChange={(e) => {
               setContentsType(e.target.value);
@@ -316,7 +307,7 @@ export default function App() {
           <label className="block mt-2">
             <span className="text-gray-700">Rate</span>
             <select
-              className="mt-1 block w-full border rounded p-2"
+              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
               value={contentsRate}
               onChange={(e) => setContentsRate(e.target.value)}
             >
@@ -334,34 +325,31 @@ export default function App() {
           <span className="text-gray-700">Value ($)</span>
           <input
             type="number"
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={contentsValue}
             onChange={(e) => setContentsValue(e.target.value)}
           />
         </label>
 
         <button
-          className="w-full bg-purple-600 text-white rounded p-2 mt-3"
+          className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
           onClick={calculateContentsPremium}
         >
           Calculate Contents Premium
         </button>
 
         {contentsPremium && (
-          <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Calculated Contents Premium:</strong> ${contentsPremium}
-          </div>
+          <ResultBox>Calculated Contents Premium: ${contentsPremium}</ResultBox>
         )}
-      </div>
+      </CalculatorCard>
 
-      {/* --- Contractors Equipment --- */}
-      <div>
-        <h2 className="text-xl font-bold">Contractors Equipment Premium</h2>
+      {/* --- Contractors Equipment Premium --- */}
+      <CalculatorCard title="Contractors Equipment Premium">
         <label className="block mt-2">
           <span className="text-gray-700">Value ($)</span>
           <input
             type="number"
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={equipmentValue}
             onChange={(e) => setEquipmentValue(e.target.value)}
           />
@@ -370,7 +358,7 @@ export default function App() {
         <label className="block mt-2">
           <span className="text-gray-700">Rate</span>
           <select
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={equipmentRate}
             onChange={(e) => setEquipmentRate(e.target.value)}
           >
@@ -384,26 +372,23 @@ export default function App() {
         </label>
 
         <button
-          className="w-full bg-yellow-600 text-white rounded p-2 mt-3"
+          className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
           onClick={calculateEquipmentPremium}
         >
           Calculate Equipment Premium
         </button>
 
         {equipmentPremium && (
-          <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Calculated Equipment Premium:</strong> ${equipmentPremium}
-          </div>
+          <ResultBox>Calculated Equipment Premium: ${equipmentPremium}</ResultBox>
         )}
-      </div>
+      </CalculatorCard>
 
       {/* --- Installation Floater --- */}
-      <div>
-        <h2 className="text-xl font-bold">Installation Floater</h2>
+      <CalculatorCard title="Installation Floater">
         <label className="block mt-2">
           <span className="text-gray-700">Installation Amount</span>
           <select
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={installationAmount}
             onChange={(e) => calculateInstallationPremium(e.target.value)}
           >
@@ -417,110 +402,116 @@ export default function App() {
         </label>
 
         {installationPremium && (
-          <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Installation Floater Premium:</strong> ${installationPremium}
-          </div>
+          <ResultBox>Installation Floater Premium: ${installationPremium}</ResultBox>
         )}
-      </div>
+      </CalculatorCard>
 
-      {/* --- Fleet Vehicles --- */}
-      <div>
-        <h2 className="text-xl font-bold">Fleet Vehicles Premium</h2>
-
+      {/* --- Fleet Vehicles Premium --- */}
+      <CalculatorCard title="Fleet Vehicles Premium">
         <label className="block mt-2">
-          <span className="text-gray-700">Total Number of Vehicles</span>
+          <span className="text-gray-700">Total Vehicles</span>
           <input
             type="number"
-            className="mt-1 block w-full border rounded p-2"
+            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
             value={totalVehicles}
             onChange={(e) => setTotalVehicles(e.target.value)}
           />
         </label>
 
-        {/* Vehicle input */}
-        <label className="block mt-2">
-          <span className="text-gray-700">Vehicle Type</span>
-          <select
-            className="mt-1 block w-full border rounded p-2"
-            value={vehicleType}
-            onChange={(e) => setVehicleType(e.target.value)}
-          >
-            <option value="">-- Select Vehicle Type --</option>
-            {["PPV", "36 Class", "44/45 Class", "47 Class"].map((v) => (
-              <option key={v} value={v}>{v}</option>
-            ))}
-          </select>
-        </label>
+        <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <span className="text-gray-700">Vehicle Type</span>
+            <select
+              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value)}
+            >
+              <option value="">-- Select Type --</option>
+              {["PPV", "36 Class", "44/45 Class", "47 Class"].map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <label className="block mt-2">
-          <span className="text-gray-700">Number of this Vehicle</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded p-2"
-            value={vehicleCount}
-            onChange={(e) => setVehicleCount(e.target.value)}
-          />
-        </label>
+          <div>
+            <span className="text-gray-700"># of Vehicles</span>
+            <input
+              type="number"
+              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
+              value={vehicleCount}
+              onChange={(e) => setVehicleCount(e.target.value)}
+            />
+          </div>
 
-        <button
-          className="w-full bg-pink-600 text-white rounded p-2 mt-2"
-          onClick={addVehicle}
-        >
-          Add Vehicle
-        </button>
+          <div className="flex items-end">
+            <button
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg p-2 transition"
+              onClick={addVehicle}
+            >
+              Add Vehicle
+            </button>
+          </div>
+        </div>
 
-        {/* Trailer inputs */}
-        <label className="block mt-4">
-          <span className="text-gray-700">Number of Large Trailers</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded p-2"
-            value={numLargeTrailers}
-            onChange={(e) => setNumLargeTrailers(e.target.value)}
-          />
-        </label>
-
-        <label className="block mt-2">
-          <span className="text-gray-700">Number of Small Trailers</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded p-2"
-            value={numSmallTrailers}
-            onChange={(e) => setNumSmallTrailers(e.target.value)}
-          />
-        </label>
+        <div className="mt-4">
+          <span className="text-gray-700">Trailers</span>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <input
+              type="number"
+              placeholder="Large Trailers"
+              className="block w-full border rounded-lg p-2 shadow-sm"
+              value={numLargeTrailers}
+              onChange={(e) => setNumLargeTrailers(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Small Trailers"
+              className="block w-full border rounded-lg p-2 shadow-sm"
+              value={numSmallTrailers}
+              onChange={(e) => setNumSmallTrailers(e.target.value)}
+            />
+          </div>
+        </div>
 
         {fleetVehicles.length > 0 && (
-          <div className="mt-2">
-            <ul className="list-disc list-inside">
-              {fleetVehicles.map((v, idx) => (
-                <li key={idx}>{v.count} × {v.type}</li>
-              ))}
-            </ul>
-          </div>
+          <ul className="mt-3 list-disc list-inside">
+            {fleetVehicles.map((v, idx) => (
+              <li key={idx}>
+                {v.count} × {v.type}
+              </li>
+            ))}
+          </ul>
         )}
 
-        <button
-          className="w-full bg-gray-600 text-white rounded p-2 mt-2"
-          onClick={resetFleet}
-        >
-          Reset Fleet
-        </button>
+        <div className="mt-3 flex gap-3">
+          <button
+            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg p-2 transition"
+            onClick={resetFleet}
+          >
+            Reset Fleet
+          </button>
+          <button
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg p-2 transition"
+            onClick={calculateFleetPremium}
+          >
+            Calculate Fleet Premium
+          </button>
+        </div>
 
-        <button
-          className="w-full bg-red-600 text-white rounded p-2 mt-3"
-          onClick={calculateFleetPremium}
-        >
-          Calculate Fleet Premium
-        </button>
-
-        {fleetPremium !== null && (
-          <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Total Fleet Premium:</strong> ${fleetPremium}
-          </div>
-        )}
-      </div>
+        {fleetPremium !== null && <ResultBox>Total Fleet Premium: ${fleetPremium}</ResultBox>}
+      </CalculatorCard>
     </div>
   );
 }
+
+// ---------------- Helper Components ----------------
+const CalculatorCard = ({ title, children }) => (
+  <div className="bg-white rounded-2xl shadow-md p-6">{children}</div>
+);
+
+const ResultBox = ({ children }) => (
+  <div className="mt-2 p-3 bg-gray-100 rounded-lg font-semibold">{children}</div>
+);
 
