@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function App() {
-  // ---------------- Business Premium ----------------
+  // ---------------- Business ----------------
   const [business, setBusiness] = useState("");
   const [revenue, setRevenue] = useState("");
   const [businessRate, setBusinessRate] = useState("");
@@ -24,14 +24,13 @@ export default function App() {
   };
 
   const calculateBusinessPremium = () => {
-    if (!business || (!businessRate && business !== "Other")) return;
     const rate = business === "Other" ? parseFloat(customRate) : parseFloat(businessRate);
-    if (!rate) return;
+    if (!rate || !revenue) return;
     const premium = (parseFloat(revenue) / 1000) * rate;
     setBusinessPremium(premium.toFixed(2));
   };
 
-  // ---------------- Building Premium ----------------
+  // ---------------- Building ----------------
   const [buildingType, setBuildingType] = useState("");
   const [buildingValue, setBuildingValue] = useState("");
   const [buildingRate, setBuildingRate] = useState("");
@@ -48,7 +47,7 @@ export default function App() {
     setBuildingPremium(premium.toFixed(2));
   };
 
-  // ---------------- Contents / Stock / Equipment ----------------
+  // ---------------- Contents ----------------
   const [contentsType, setContentsType] = useState("");
   const [contentsValue, setContentsValue] = useState("");
   const [contentsRate, setContentsRate] = useState("");
@@ -65,11 +64,10 @@ export default function App() {
     setContentsPremium(premium.toFixed(2));
   };
 
-  // ---------------- Contractors Equipment ----------------
+  // ---------------- Equipment ----------------
   const [equipmentValue, setEquipmentValue] = useState("");
   const [equipmentRate, setEquipmentRate] = useState("");
   const [equipmentPremium, setEquipmentPremium] = useState(null);
-
   const equipmentRates = [0.45, 1];
 
   const calculateEquipmentPremium = () => {
@@ -89,15 +87,13 @@ export default function App() {
   ];
 
   const calculateInstallationPremium = (selectedAmount) => {
-    if (!selectedAmount) return;
-    const option = installationOptions.find(
-      (o) => o.amount === parseInt(selectedAmount)
-    );
+    const option = installationOptions.find((o) => o.amount === parseInt(selectedAmount));
+    if (!option) return;
     setInstallationAmount(option.amount);
     setInstallationPremium(option.premium.toFixed(2));
   };
 
-  // ---------------- Fleet Vehicles ----------------
+  // ---------------- Fleet ----------------
   const vehicleRatesSmall = { PPV: 2500, "36 Class": 2000, "44/45 Class": 3500, "47 Class": 6000 };
   const vehicleRatesLarge = { PPV: 2000, "36 Class": 1500, "44/45 Class": 3000, "47 Class": 4000 };
   const trailerRates = { Large: 1000, Small: 500 };
@@ -105,7 +101,6 @@ export default function App() {
   const [totalVehicles, setTotalVehicles] = useState("");
   const [fleetVehicles, setFleetVehicles] = useState([]);
   const [fleetPremium, setFleetPremium] = useState(null);
-
   const [vehicleType, setVehicleType] = useState("");
   const [vehicleCount, setVehicleCount] = useState("");
   const [numLargeTrailers, setNumLargeTrailers] = useState("");
@@ -122,15 +117,9 @@ export default function App() {
     const isSmallFleet = parseInt(totalVehicles) <= 10;
     const rates = isSmallFleet ? vehicleRatesSmall : vehicleRatesLarge;
     let total = 0;
-
-    fleetVehicles.forEach((v) => {
-      total += v.count * rates[v.type];
-    });
-
-    // Add trailer premium separately
+    fleetVehicles.forEach((v) => total += v.count * rates[v.type]);
     total += (parseInt(numLargeTrailers) || 0) * trailerRates.Large;
     total += (parseInt(numSmallTrailers) || 0) * trailerRates.Small;
-
     setFleetPremium(total);
   };
 
@@ -145,373 +134,141 @@ export default function App() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* --- Business Premium --- */}
-      <CalculatorCard title="Business Premium Calculator">
-        <label className="block mt-2">
-          <span className="text-gray-700">Type of Business</span>
-          <select
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={business}
-            onChange={(e) => {
-              setBusiness(e.target.value);
-              setBusinessRate("");
-              setCustomRate("");
-            }}
-          >
-            <option value="">-- Select --</option>
-            {Object.entries(businessRates).map(([type, rates]) => (
-              <option key={type} value={type}>
-                {type} ({rates.join(", ")})
-              </option>
-            ))}
-            <option value="Other">Other</option>
-          </select>
-        </label>
-
-        {business === "Other" ? (
-          <label className="block mt-2">
-            <span className="text-gray-700">Custom Rate</span>
-            <input
-              type="number"
-              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-              value={customRate}
-              onChange={(e) => setCustomRate(e.target.value)}
-            />
-          </label>
-        ) : (
-          business && (
-            <label className="block mt-2">
-              <span className="text-gray-700">Select Rate</span>
-              <select
-                className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-                value={businessRate}
-                onChange={(e) => setBusinessRate(e.target.value)}
-              >
-                <option value="">-- Select Rate --</option>
-                {businessRates[business].map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )
-        )}
-
-        <label className="block mt-2">
-          <span className="text-gray-700">Revenue ($)</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={revenue}
-            onChange={(e) => setRevenue(e.target.value)}
-          />
-        </label>
-
-        <button
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
-          onClick={calculateBusinessPremium}
-        >
-          Calculate Business Premium
-        </button>
-
-        {businessPremium && (
-          <ResultBox>Calculated Business Premium: ${businessPremium}</ResultBox>
-        )}
+    <div className="p-6 max-w-5xl mx-auto space-y-8 bg-gray-50 min-h-screen">
+      <CalculatorCard title="Business Premium">
+        <BusinessSection {...{business, setBusiness, businessRate, setBusinessRate, customRate, setCustomRate, revenue, setRevenue, businessRates, businessPremium, calculateBusinessPremium}} />
       </CalculatorCard>
 
-      {/* --- Building Premium --- */}
-      <CalculatorCard title="Building Premium Calculator">
-        <label className="block mt-2">
-          <span className="text-gray-700">Building Type</span>
-          <select
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={buildingType}
-            onChange={(e) => {
-              setBuildingType(e.target.value);
-              setBuildingRate("");
-            }}
-          >
-            <option value="">-- Select --</option>
-            {Object.keys(buildingRates).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {buildingType && (
-          <label className="block mt-2">
-            <span className="text-gray-700">Rate</span>
-            <select
-              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-              value={buildingRate}
-              onChange={(e) => setBuildingRate(e.target.value)}
-            >
-              <option value="">-- Select Rate --</option>
-              {buildingRates[buildingType].map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-
-        <label className="block mt-2">
-          <span className="text-gray-700">Building Value ($)</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={buildingValue}
-            onChange={(e) => setBuildingValue(e.target.value)}
-          />
-        </label>
-
-        <button
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
-          onClick={calculateBuildingPremium}
-        >
-          Calculate Building Premium
-        </button>
-
-        {buildingPremium && (
-          <ResultBox>Calculated Building Premium: ${buildingPremium}</ResultBox>
-        )}
+      <CalculatorCard title="Building Premium">
+        <BuildingSection {...{buildingType, setBuildingType, buildingValue, setBuildingValue, buildingRate, setBuildingRate, buildingRates, buildingPremium, calculateBuildingPremium}} />
       </CalculatorCard>
 
-      {/* --- Contents Premium --- */}
-      <CalculatorCard title="Contents / Stock / Equipment Premium">
-        <label className="block mt-2">
-          <span className="text-gray-700">Type</span>
-          <select
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={contentsType}
-            onChange={(e) => {
-              setContentsType(e.target.value);
-              setContentsRate("");
-            }}
-          >
-            <option value="">-- Select --</option>
-            {Object.keys(contentsRates).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {contentsType && (
-          <label className="block mt-2">
-            <span className="text-gray-700">Rate</span>
-            <select
-              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-              value={contentsRate}
-              onChange={(e) => setContentsRate(e.target.value)}
-            >
-              <option value="">-- Select Rate --</option>
-              {contentsRates[contentsType].map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-
-        <label className="block mt-2">
-          <span className="text-gray-700">Value ($)</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={contentsValue}
-            onChange={(e) => setContentsValue(e.target.value)}
-          />
-        </label>
-
-        <button
-          className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
-          onClick={calculateContentsPremium}
-        >
-          Calculate Contents Premium
-        </button>
-
-        {contentsPremium && (
-          <ResultBox>Calculated Contents Premium: ${contentsPremium}</ResultBox>
-        )}
+      <CalculatorCard title="Contents / Stock / Equipment">
+        <ContentsSection {...{contentsType, setContentsType, contentsValue, setContentsValue, contentsRate, setContentsRate, contentsRates, contentsPremium, calculateContentsPremium}} />
       </CalculatorCard>
 
-      {/* --- Contractors Equipment Premium --- */}
-      <CalculatorCard title="Contractors Equipment Premium">
-        <label className="block mt-2">
-          <span className="text-gray-700">Value ($)</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={equipmentValue}
-            onChange={(e) => setEquipmentValue(e.target.value)}
-          />
-        </label>
-
-        <label className="block mt-2">
-          <span className="text-gray-700">Rate</span>
-          <select
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={equipmentRate}
-            onChange={(e) => setEquipmentRate(e.target.value)}
-          >
-            <option value="">-- Select Rate --</option>
-            {equipmentRates.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg p-2 mt-3 transition"
-          onClick={calculateEquipmentPremium}
-        >
-          Calculate Equipment Premium
-        </button>
-
-        {equipmentPremium && (
-          <ResultBox>Calculated Equipment Premium: ${equipmentPremium}</ResultBox>
-        )}
+      <CalculatorCard title="Contractors Equipment">
+        <EquipmentSection {...{equipmentValue, setEquipmentValue, equipmentRate, setEquipmentRate, equipmentRates, equipmentPremium, calculateEquipmentPremium}} />
       </CalculatorCard>
 
-      {/* --- Installation Floater --- */}
       <CalculatorCard title="Installation Floater">
-        <label className="block mt-2">
-          <span className="text-gray-700">Installation Amount</span>
-          <select
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={installationAmount}
-            onChange={(e) => calculateInstallationPremium(e.target.value)}
-          >
-            <option value="">-- Select Amount --</option>
-            {installationOptions.map((o) => (
-              <option key={o.amount} value={o.amount}>
-                ${o.amount.toLocaleString()} → Premium ${o.premium.toLocaleString()}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {installationPremium && (
-          <ResultBox>Installation Floater Premium: ${installationPremium}</ResultBox>
-        )}
+        <InstallationSection {...{installationAmount, installationPremium, calculateInstallationPremium, installationOptions}} />
       </CalculatorCard>
 
-      {/* --- Fleet Vehicles Premium --- */}
-      <CalculatorCard title="Fleet Vehicles Premium">
-        <label className="block mt-2">
-          <span className="text-gray-700">Total Vehicles</span>
-          <input
-            type="number"
-            className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-            value={totalVehicles}
-            onChange={(e) => setTotalVehicles(e.target.value)}
-          />
-        </label>
-
-        <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <span className="text-gray-700">Vehicle Type</span>
-            <select
-              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-              value={vehicleType}
-              onChange={(e) => setVehicleType(e.target.value)}
-            >
-              <option value="">-- Select Type --</option>
-              {["PPV", "36 Class", "44/45 Class", "47 Class"].map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <span className="text-gray-700"># of Vehicles</span>
-            <input
-              type="number"
-              className="mt-1 block w-full border rounded-lg p-2 shadow-sm"
-              value={vehicleCount}
-              onChange={(e) => setVehicleCount(e.target.value)}
-            />
-          </div>
-
-          <div className="flex items-end">
-            <button
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg p-2 transition"
-              onClick={addVehicle}
-            >
-              Add Vehicle
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <span className="text-gray-700">Trailers</span>
-          <div className="mt-2 grid grid-cols-2 gap-3">
-            <input
-              type="number"
-              placeholder="Large Trailers"
-              className="block w-full border rounded-lg p-2 shadow-sm"
-              value={numLargeTrailers}
-              onChange={(e) => setNumLargeTrailers(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Small Trailers"
-              className="block w-full border rounded-lg p-2 shadow-sm"
-              value={numSmallTrailers}
-              onChange={(e) => setNumSmallTrailers(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {fleetVehicles.length > 0 && (
-          <ul className="mt-3 list-disc list-inside">
-            {fleetVehicles.map((v, idx) => (
-              <li key={idx}>
-                {v.count} × {v.type}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <div className="mt-3 flex gap-3">
-          <button
-            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg p-2 transition"
-            onClick={resetFleet}
-          >
-            Reset Fleet
-          </button>
-          <button
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg p-2 transition"
-            onClick={calculateFleetPremium}
-          >
-            Calculate Fleet Premium
-          </button>
-        </div>
-
-        {fleetPremium !== null && <ResultBox>Total Fleet Premium: ${fleetPremium}</ResultBox>}
+      <CalculatorCard title="Fleet Vehicles">
+        <FleetSection {...{totalVehicles, setTotalVehicles, vehicleType, setVehicleType, vehicleCount, setVehicleCount, fleetVehicles, addVehicle, resetFleet, numLargeTrailers, setNumLargeTrailers, numSmallTrailers, setNumSmallTrailers, fleetPremium, calculateFleetPremium}} />
       </CalculatorCard>
     </div>
   );
 }
 
 // ---------------- Helper Components ----------------
-const CalculatorCard = ({ title, children }) => (
-  <div className="bg-white rounded-2xl shadow-md p-6">{children}</div>
+const CalculatorCard = ({ children, title }) => (
+  <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+    <h2 className="text-xl font-bold">{title}</h2>
+    {children}
+  </div>
 );
 
 const ResultBox = ({ children }) => (
-  <div className="mt-2 p-3 bg-gray-100 rounded-lg font-semibold">{children}</div>
+  <div className="mt-3 p-3 bg-blue-50 text-blue-700 font-bold rounded-lg text-lg">{children}</div>
 );
 
+// ---------------- Section Components ----------------
+const BusinessSection = ({ business, setBusiness, businessRate, setBusinessRate, customRate, setCustomRate, revenue, setRevenue, businessRates, businessPremium, calculateBusinessPremium }) => (
+  <>
+    <select className="w-full border rounded p-2 mb-2" value={business} onChange={(e) => { setBusiness(e.target.value); setBusinessRate(""); setCustomRate(""); }}>
+      <option value="">-- Type of Business --</option>
+      {Object.entries(businessRates).map(([type, rates]) => <option key={type} value={type}>{type} ({rates.join(", ")})</option>)}
+      <option value="Other">Other</option>
+    </select>
+    {business === "Other" && <input type="number" placeholder="Custom Rate" className="w-full border rounded p-2 mb-2" value={customRate} onChange={(e) => setCustomRate(e.target.value)} />}
+    {business !== "Other" && business && <select className="w-full border rounded p-2 mb-2" value={businessRate} onChange={(e) => setBusinessRate(e.target.value)}>
+      <option value="">-- Select Rate --</option>
+      {businessRates[business].map((rate) => <option key={rate} value={rate}>{rate}</option>)}
+    </select>}
+    <input type="number" placeholder="Revenue" className="w-full border rounded p-2 mb-2" value={revenue} onChange={(e) => setRevenue(e.target.value)} />
+    <button className="bg-blue-600 text-white p-2 rounded mb-2" onClick={calculateBusinessPremium}>Calculate</button>
+    {businessPremium !== null && <ResultBox>Business Premium: ${businessPremium}</ResultBox>}
+  </>
+);
+
+const BuildingSection = ({ buildingType, setBuildingType, buildingValue, setBuildingValue, buildingRate, setBuildingRate, buildingRates, buildingPremium, calculateBuildingPremium }) => (
+  <>
+    <select className="w-full border rounded p-2 mb-2" value={buildingType} onChange={(e) => { setBuildingType(e.target.value); setBuildingRate(""); }}>
+      <option value="">-- Building Type --</option>
+      {Object.entries(buildingRates).map(([type, rates]) => <option key={type} value={type}>{type} ({rates.join(", ")})</option>)}
+    </select>
+    {buildingType && <select className="w-full border rounded p-2 mb-2" value={buildingRate} onChange={(e) => setBuildingRate(e.target.value)}>
+      <option value="">-- Select Rate --</option>
+      {buildingRates[buildingType].map((rate) => <option key={rate} value={rate}>{rate}</option>)}
+    </select>}
+    <input type="number" placeholder="Building Value" className="w-full border rounded p-2 mb-2" value={buildingValue} onChange={(e) => setBuildingValue(e.target.value)} />
+    <button className="bg-blue-600 text-white p-2 rounded mb-2" onClick={calculateBuildingPremium}>Calculate</button>
+    {buildingPremium !== null && <ResultBox>Building Premium: ${buildingPremium}</ResultBox>}
+  </>
+);
+
+const ContentsSection = ({ contentsType, setContentsType, contentsValue, setContentsValue, contentsRate, setContentsRate, contentsRates, contentsPremium, calculateContentsPremium }) => (
+  <>
+    <select className="w-full border rounded p-2 mb-2" value={contentsType} onChange={(e) => { setContentsType(e.target.value); setContentsRate(""); }}>
+      <option value="">-- Contents Type --</option>
+      {Object.entries(contentsRates).map(([type, rates]) => <option key={type} value={type}>{type} ({rates.join(", ")})</option>)}
+    </select>
+    {contentsType && <select className="w-full border rounded p-2 mb-2" value={contentsRate} onChange={(e) => setContentsRate(e.target.value)}>
+      <option value="">-- Select Rate --</option>
+      {contentsRates[contentsType].map((rate) => <option key={rate} value={rate}>{rate}</option>)}
+    </select>}
+    <input type="number" placeholder="Contents Value" className="w-full border rounded p-2 mb-2" value={contentsValue} onChange={(e) => setContentsValue(e.target.value)} />
+    <button className="bg-blue-600 text-white p-2 rounded mb-2" onClick={calculateContentsPremium}>Calculate</button>
+    {contentsPremium !== null && <ResultBox>Contents Premium: ${contentsPremium}</ResultBox>}
+  </>
+);
+
+const EquipmentSection = ({ equipmentValue, setEquipmentValue, equipmentRate, setEquipmentRate, equipmentRates, equipmentPremium, calculateEquipmentPremium }) => (
+  <>
+    <select className="w-full border rounded p-2 mb-2" value={equipmentRate} onChange={(e) => setEquipmentRate(e.target.value)}>
+      <option value="">-- Select Rate --</option>
+      {equipmentRates.map((rate) => <option key={rate} value={rate}>{rate}</option>)}
+    </select>
+    <input type="number" placeholder="Equipment Value" className="w-full border rounded p-2 mb-2" value={equipmentValue} onChange={(e) => setEquipmentValue(e.target.value)} />
+    <button className="bg-blue-600 text-white p-2 rounded mb-2" onClick={calculateEquipmentPremium}>Calculate</button>
+    {equipmentPremium !== null && <ResultBox>Equipment Premium: ${equipmentPremium}</ResultBox>}
+  </>
+);
+
+const InstallationSection = ({ installationAmount, installationPremium, calculateInstallationPremium, installationOptions }) => (
+  <>
+    <select className="w-full border rounded p-2 mb-2" value={installationAmount} onChange={(e) => calculateInstallationPremium(e.target.value)}>
+      <option value="">-- Installation Amount --</option>
+      {installationOptions.map((opt) => <option key={opt.amount} value={opt.amount}>${opt.amount.toLocaleString()}</option>)}
+    </select>
+    {installationPremium !== null && <ResultBox>Installation Floater Premium: ${installationPremium}</ResultBox>}
+  </>
+);
+
+const FleetSection = ({ totalVehicles, setTotalVehicles, vehicleType, setVehicleType, vehicleCount, setVehicleCount, fleetVehicles, addVehicle, resetFleet, numLargeTrailers, setNumLargeTrailers, numSmallTrailers, setNumSmallTrailers, fleetPremium, calculateFleetPremium }) => (
+  <>
+    <input type="number" placeholder="Total Vehicles" className="w-full border rounded p-2 mb-2" value={totalVehicles} onChange={(e) => setTotalVehicles(e.target.value)} />
+    <div className="flex gap-2 mb-2">
+      <select className="flex-1 border rounded p-2" value={vehicleType} onChange={(e) => setVehicleType(e.target.value)}>
+        <option value="">-- Vehicle Type --</option>
+        <option value="PPV">PPV</option>
+        <option value="36 Class">36 Class</option>
+        <option value="44/45 Class">44/45 Class</option>
+        <option value="47 Class">47 Class</option>
+      </select>
+      <input type="number" placeholder="Count" className="flex-1 border rounded p-2" value={vehicleCount} onChange={(e) => setVehicleCount(e.target.value)} />
+      <button className="bg-green-600 text-white p-2 rounded" onClick={addVehicle}>Add</button>
+    </div>
+    <div className="mb-2">
+      <input type="number" placeholder="Number of Large Trailers" className="border rounded p-2 mb-2 w-full" value={numLargeTrailers} onChange={(e) => setNumLargeTrailers(e.target.value)} />
+      <input type="number" placeholder="Number of Small Trailers" className="border rounded p-2 w-full" value={numSmallTrailers} onChange={(e) => setNumSmallTrailers(e.target.value)} />
+    </div>
+    <button className="bg-blue-600 text-white p-2 rounded mb-2" onClick={calculateFleetPremium}>Calculate Fleet Premium</button>
+    <button className="bg-gray-400 text-white p-2 rounded ml-2" onClick={resetFleet}>Reset Fleet</button>
+    {fleetVehicles.length > 0 && <div className="mt-2">Vehicles Added:</div>}
+    {fleetVehicles.map((v, i) => <div key={i}>{v.count} x {v.type}</div>)}
+    {fleetPremium !== null && <ResultBox>Fleet Premium: ${fleetPremium}</ResultBox>}
+  </>
+);
