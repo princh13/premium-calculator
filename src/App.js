@@ -82,20 +82,19 @@ export default function App() {
   const [installationAmount, setInstallationAmount] = useState("");
   const [installationPremium, setInstallationPremium] = useState(null);
 
-  const installationTable = [
+  const installationOptions = [
     { amount: 100000, premium: 500 },
     { amount: 500000, premium: 1000 },
     { amount: 1000000, premium: 2000 },
   ];
 
-  const calculateInstallationPremium = () => {
-    if (!installationAmount) return;
-    const closest = installationTable.reduce((prev, curr) =>
-      Math.abs(curr.amount - installationAmount) < Math.abs(prev.amount - installationAmount)
-        ? curr
-        : prev
+  const calculateInstallationPremium = (selectedAmount) => {
+    if (!selectedAmount) return;
+    const option = installationOptions.find(
+      (o) => o.amount === parseInt(selectedAmount)
     );
-    setInstallationPremium(closest.premium.toFixed(2));
+    setInstallationAmount(option.amount);
+    setInstallationPremium(option.premium.toFixed(2));
   };
 
   // ---------------- Fleet Vehicles ----------------
@@ -126,7 +125,10 @@ export default function App() {
 
   const addVehicle = () => {
     if (!vehicleType || !vehicleCount) return;
-    setFleetVehicles([...fleetVehicles, { type: vehicleType, count: parseInt(vehicleCount) }]);
+    setFleetVehicles([
+      ...fleetVehicles,
+      { type: vehicleType, count: parseInt(vehicleCount) },
+    ]);
     setVehicleType("");
     setVehicleCount("");
   };
@@ -141,13 +143,19 @@ export default function App() {
     setFleetPremium(total);
   };
 
+  const resetFleet = () => {
+    setTotalVehicles("");
+    setFleetVehicles([]);
+    setFleetPremium(null);
+    setVehicleType("");
+    setVehicleCount("");
+  };
+
   return (
     <div className="p-6 max-w-md mx-auto bg-white rounded-2xl shadow-md space-y-6">
-
       {/* --- Business Premium --- */}
       <div>
         <h2 className="text-xl font-bold">Business Premium Calculator</h2>
-
         <label className="block mt-2">
           <span className="text-gray-700">Type of Business</span>
           <select
@@ -226,7 +234,6 @@ export default function App() {
       {/* --- Building Premium --- */}
       <div>
         <h2 className="text-xl font-bold">Building Premium Calculator</h2>
-
         <label className="block mt-2">
           <span className="text-gray-700">Building Type</span>
           <select
@@ -239,7 +246,9 @@ export default function App() {
           >
             <option value="">-- Select --</option>
             {Object.keys(buildingRates).map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>
+                {type}
+              </option>
             ))}
           </select>
         </label>
@@ -254,7 +263,9 @@ export default function App() {
             >
               <option value="">-- Select Rate --</option>
               {buildingRates[buildingType].map((r) => (
-                <option key={r} value={r}>{r}</option>
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
             </select>
           </label>
@@ -286,8 +297,9 @@ export default function App() {
 
       {/* --- Contents Premium --- */}
       <div>
-        <h2 className="text-xl font-bold">Contents / Stock / Equipment / EDP / Customer Goods Premium</h2>
-
+        <h2 className="text-xl font-bold">
+          Contents / Stock / Equipment / EDP / Customer Goods Premium
+        </h2>
         <label className="block mt-2">
           <span className="text-gray-700">Type</span>
           <select
@@ -300,7 +312,9 @@ export default function App() {
           >
             <option value="">-- Select --</option>
             {Object.keys(contentsRates).map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>
+                {type}
+              </option>
             ))}
           </select>
         </label>
@@ -315,7 +329,9 @@ export default function App() {
             >
               <option value="">-- Select Rate --</option>
               {contentsRates[contentsType].map((r) => (
-                <option key={r} value={r}>{r}</option>
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
             </select>
           </label>
@@ -348,7 +364,6 @@ export default function App() {
       {/* --- Contractors Equipment --- */}
       <div>
         <h2 className="text-xl font-bold">Contractors Equipment Premium</h2>
-
         <label className="block mt-2">
           <span className="text-gray-700">Value ($)</span>
           <input
@@ -368,7 +383,9 @@ export default function App() {
           >
             <option value="">-- Select Rate --</option>
             {equipmentRates.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </select>
         </label>
@@ -392,25 +409,24 @@ export default function App() {
         <h2 className="text-xl font-bold">Installation Floater Premium</h2>
 
         <label className="block mt-2">
-          <span className="text-gray-700">Installation Amount ($)</span>
-          <input
-            type="number"
+          <span className="text-gray-700">Installation Amount</span>
+          <select
             className="mt-1 block w-full border rounded p-2"
-            value={installationAmount}
-            onChange={(e) => setInstallationAmount(e.target.value)}
-          />
+            onChange={(e) => calculateInstallationPremium(e.target.value)}
+          >
+            <option value="">-- Select Amount --</option>
+            {installationOptions.map((o) => (
+              <option key={o.amount} value={o.amount}>
+                ${o.amount.toLocaleString()}
+              </option>
+            ))}
+          </select>
         </label>
-
-        <button
-          className="w-full bg-yellow-600 text-white rounded p-2 mt-3"
-          onClick={calculateInstallationPremium}
-        >
-          Calculate Installation Premium
-        </button>
 
         {installationPremium && (
           <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Calculated Installation Premium:</strong> ${installationPremium}
+            <strong>Calculated Installation Premium:</strong> $
+            {installationPremium}
           </div>
         )}
       </div>
@@ -445,7 +461,9 @@ export default function App() {
               "Large Trailers",
               "Small Trailers",
             ].map((v) => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v} value={v}>
+                {v}
+              </option>
             ))}
           </select>
         </label>
@@ -465,6 +483,13 @@ export default function App() {
           onClick={addVehicle}
         >
           Add Vehicle
+        </button>
+
+        <button
+          className="w-full bg-gray-600 text-white rounded p-2 mt-2"
+          onClick={resetFleet}
+        >
+          Reset Fleet
         </button>
 
         {fleetVehicles.length > 0 && (
@@ -492,7 +517,6 @@ export default function App() {
           </div>
         )}
       </div>
-
     </div>
   );
 }
