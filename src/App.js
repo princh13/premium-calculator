@@ -98,48 +98,39 @@ export default function App() {
   };
 
   // ---------------- Fleet Vehicles ----------------
+  const vehicleRatesSmall = { PPV: 2500, "36 Class": 2000, "44/45 Class": 3500, "47 Class": 6000 };
+  const vehicleRatesLarge = { PPV: 2000, "36 Class": 1500, "44/45 Class": 3000, "47 Class": 4000 };
+  const trailerRates = { Large: 1000, Small: 500 };
+
   const [totalVehicles, setTotalVehicles] = useState("");
   const [fleetVehicles, setFleetVehicles] = useState([]);
   const [fleetPremium, setFleetPremium] = useState(null);
 
-  const smallFleetRates = {
-    PPV: 2500,
-    "36 Class": 2000,
-    "44/45 Class": 3500,
-    "47 Class": 6000,
-    "Large Trailers": 1000,
-    "Small Trailers": 500,
-  };
-
-  const largeFleetRates = {
-    PPV: 2000,
-    "36 Class": 1500,
-    "44/45 Class": 3000,
-    "47 Class": 4000,
-    "Large Trailers": 1000,
-    "Small Trailers": 500,
-  };
-
   const [vehicleType, setVehicleType] = useState("");
   const [vehicleCount, setVehicleCount] = useState("");
+  const [numLargeTrailers, setNumLargeTrailers] = useState("");
+  const [numSmallTrailers, setNumSmallTrailers] = useState("");
 
   const addVehicle = () => {
     if (!vehicleType || !vehicleCount) return;
-    setFleetVehicles([
-      ...fleetVehicles,
-      { type: vehicleType, count: parseInt(vehicleCount) },
-    ]);
+    setFleetVehicles([...fleetVehicles, { type: vehicleType, count: parseInt(vehicleCount) }]);
     setVehicleType("");
     setVehicleCount("");
   };
 
   const calculateFleetPremium = () => {
     const isSmallFleet = parseInt(totalVehicles) <= 10;
-    const rates = isSmallFleet ? smallFleetRates : largeFleetRates;
+    const rates = isSmallFleet ? vehicleRatesSmall : vehicleRatesLarge;
     let total = 0;
+
     fleetVehicles.forEach((v) => {
       total += v.count * rates[v.type];
     });
+
+    // Add trailer premium separately
+    total += (parseInt(numLargeTrailers) || 0) * trailerRates.Large;
+    total += (parseInt(numSmallTrailers) || 0) * trailerRates.Small;
+
     setFleetPremium(total);
   };
 
@@ -149,6 +140,8 @@ export default function App() {
     setFleetPremium(null);
     setVehicleType("");
     setVehicleCount("");
+    setNumLargeTrailers("");
+    setNumSmallTrailers("");
   };
 
   return (
@@ -391,7 +384,7 @@ export default function App() {
         </label>
 
         <button
-          className="w-full bg-indigo-600 text-white rounded p-2 mt-3"
+          className="w-full bg-yellow-600 text-white rounded p-2 mt-3"
           onClick={calculateEquipmentPremium}
         >
           Calculate Equipment Premium
@@ -406,18 +399,18 @@ export default function App() {
 
       {/* --- Installation Floater --- */}
       <div>
-        <h2 className="text-xl font-bold">Installation Floater Premium</h2>
-
+        <h2 className="text-xl font-bold">Installation Floater</h2>
         <label className="block mt-2">
           <span className="text-gray-700">Installation Amount</span>
           <select
             className="mt-1 block w-full border rounded p-2"
+            value={installationAmount}
             onChange={(e) => calculateInstallationPremium(e.target.value)}
           >
             <option value="">-- Select Amount --</option>
             {installationOptions.map((o) => (
               <option key={o.amount} value={o.amount}>
-                ${o.amount.toLocaleString()}
+                ${o.amount.toLocaleString()} → Premium ${o.premium.toLocaleString()}
               </option>
             ))}
           </select>
@@ -425,8 +418,7 @@ export default function App() {
 
         {installationPremium && (
           <div className="p-3 bg-gray-100 rounded mt-2">
-            <strong>Calculated Installation Premium:</strong> $
-            {installationPremium}
+            <strong>Installation Floater Premium:</strong> ${installationPremium}
           </div>
         )}
       </div>
@@ -445,6 +437,7 @@ export default function App() {
           />
         </label>
 
+        {/* Vehicle input */}
         <label className="block mt-2">
           <span className="text-gray-700">Vehicle Type</span>
           <select
@@ -453,17 +446,8 @@ export default function App() {
             onChange={(e) => setVehicleType(e.target.value)}
           >
             <option value="">-- Select Vehicle Type --</option>
-            {[
-              "PPV",
-              "36 Class",
-              "44/45 Class",
-              "47 Class",
-              "Large Trailers",
-              "Small Trailers",
-            ].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
+            {["PPV", "36 Class", "44/45 Class", "47 Class"].map((v) => (
+              <option key={v} value={v}>{v}</option>
             ))}
           </select>
         </label>
@@ -485,24 +469,43 @@ export default function App() {
           Add Vehicle
         </button>
 
+        {/* Trailer inputs */}
+        <label className="block mt-4">
+          <span className="text-gray-700">Number of Large Trailers</span>
+          <input
+            type="number"
+            className="mt-1 block w-full border rounded p-2"
+            value={numLargeTrailers}
+            onChange={(e) => setNumLargeTrailers(e.target.value)}
+          />
+        </label>
+
+        <label className="block mt-2">
+          <span className="text-gray-700">Number of Small Trailers</span>
+          <input
+            type="number"
+            className="mt-1 block w-full border rounded p-2"
+            value={numSmallTrailers}
+            onChange={(e) => setNumSmallTrailers(e.target.value)}
+          />
+        </label>
+
+        {fleetVehicles.length > 0 && (
+          <div className="mt-2">
+            <ul className="list-disc list-inside">
+              {fleetVehicles.map((v, idx) => (
+                <li key={idx}>{v.count} × {v.type}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <button
           className="w-full bg-gray-600 text-white rounded p-2 mt-2"
           onClick={resetFleet}
         >
           Reset Fleet
         </button>
-
-        {fleetVehicles.length > 0 && (
-          <div className="mt-2">
-            <ul className="list-disc list-inside">
-              {fleetVehicles.map((v, idx) => (
-                <li key={idx}>
-                  {v.count} × {v.type}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
 
         <button
           className="w-full bg-red-600 text-white rounded p-2 mt-3"
@@ -520,3 +523,4 @@ export default function App() {
     </div>
   );
 }
+
